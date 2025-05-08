@@ -1,2 +1,2 @@
 import streamlit as st
-st.switch_page("1_Login.py")
+st.switch_page("pages/1_Login.py")

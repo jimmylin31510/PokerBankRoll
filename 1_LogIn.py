@@ -37,7 +37,7 @@ if st.button("Submit"):
         st.session_state.user = user
         st.success("✅ Login successful! Redirecting to main app...")
         time.sleep(1)
-        st.switch_page("2_Main.py")
+        st.switch_page("pages/2_Main.py")
 
     except Exception as e:
         st.error(f"❌ Authentication failed: {e}")
