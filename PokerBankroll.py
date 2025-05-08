@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
-import pyrebase
+import pyrebase4
 
 # Firebase Configuration
 firebase_config = {
@@ -15,7 +15,7 @@ firebase_config = {
     "databaseURL": ""
 }
 
-firebase = pyrebase.initialize_app(firebase_config)
+firebase = pyrebase4.initialize_app(firebase_config)
 auth = firebase.auth()
 db = firebase.database()
 
