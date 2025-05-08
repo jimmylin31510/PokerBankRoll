@@ -26,6 +26,8 @@ st.title("🎲 Poker Bankroll Tracker")
 # Session state for login
 if "user" not in st.session_state:
     st.session_state.user = None
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
 # Authentication UI
 def login():
@@ -40,13 +42,22 @@ def login():
             else:
                 user = auth.create_user_with_email_and_password(email, password)
             st.session_state.user = user
-            st.success("Successfully logged in!")
+            st.session_state.logged_in = True
+            st.experimental_rerun()
         except Exception as e:
             st.error(f"Authentication failed: {e}")
 
 if not st.session_state.user:
     login()
     st.stop()
+
+# Optional: Logout Button
+if st.session_state.logged_in:
+    st.sidebar.markdown(f"👤 Logged in as: {st.session_state.user['email']}")
+    if st.sidebar.button("🚪 Log out"):
+        st.session_state.user = None
+        st.session_state.logged_in = False
+        st.experimental_rerun()
 
 user_id = st.session_state.user["localId"]
 session_ref = f"users/{user_id}/sessions"
