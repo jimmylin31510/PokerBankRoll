@@ -1,4 +1,4 @@
 streamlit
 pandas
 matplotlib
-pyrebase4
+git+https://github.com/nhorvath/Pyrebase4.git
