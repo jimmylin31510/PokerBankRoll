@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
-import pyrebase
+import pyrebase4 as pyrebase  # ✅ 使用 pyrebase4，避免舊版錯誤
 
 # Firebase Configuration
 firebase_config = {
@@ -12,7 +12,7 @@ firebase_config = {
     "storageBucket": "pokerbankroll-cba0e.firebasestorage.app",
     "messagingSenderId": "774301975832",
     "appId": "1:774301975832:web:c0205662c4b2bb076e0a6d",
-    "databaseURL": ""
+    "databaseURL": "https://pokerbankroll-cba0e-default-rtdb.firebaseio.com/"  # ✅ 正確填入 databaseURL
 }
 
 firebase = pyrebase.initialize_app(firebase_config)
