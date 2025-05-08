@@ -13,7 +13,7 @@ firebase_config = {
     "storageBucket": "pokerbankroll-cba0e.firebasestorage.app",
     "messagingSenderId": "774301975832",
     "appId": "1:774301975832:web:c0205662c4b2bb076e0a6d",
-    "databaseURL": "https://pokerbankroll-cba0e-default-rtdb.firebaseio.com/"
+    "databaseURL": "https://pokerbankroll-cba0e-default-rtdb.asia-southeast1.firebasedatabase.app"
 }
 
 firebase = pyrebase.initialize_app(firebase_config)
