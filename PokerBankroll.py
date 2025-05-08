@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
-import pyrebase  # ✅ 使用 pyrebase4，避免舊版錯誤
+import pyrebase  # 使用 pyrebase，模組名稱不變
 
 # Firebase Configuration
 firebase_config = {
@@ -12,7 +12,7 @@ firebase_config = {
     "storageBucket": "pokerbankroll-cba0e.firebasestorage.app",
     "messagingSenderId": "774301975832",
     "appId": "1:774301975832:web:c0205662c4b2bb076e0a6d",
-    "databaseURL": "https://pokerbankroll-cba0e-default-rtdb.firebaseio.com/"  # ✅ 正確填入 databaseURL
+    "databaseURL": "https://pokerbankroll-cba0e-default-rtdb.firebaseio.com/"
 }
 
 firebase = pyrebase.initialize_app(firebase_config)
@@ -52,8 +52,11 @@ user_id = st.session_state.user["localId"]
 session_ref = f"users/{user_id}/sessions"
 
 # Load user's session data from Firebase
-session_data = db.child(session_ref).get().val()
-if not session_data:
+try:
+    data_snapshot = db.child(session_ref).get()
+    session_data = data_snapshot.val() if data_snapshot.val() else {}
+except Exception as e:
+    st.error(f"❌ Failed to load session data from Firebase: {e}")
     session_data = {}
 
 # --- Input Form ---
