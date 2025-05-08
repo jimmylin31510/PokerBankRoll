@@ -76,9 +76,12 @@ with st.form("session_form"):
             "Hourly Rate": hourly_rate,
             "Notes": notes
         }
+    try:
         token = st.session_state.user['idToken']
-        db.child(session_ref).push(entry)
+        db.child(session_ref).push(entry, token)
         st.success("Session added successfully!")
+    except Exception as e:
+        st.error(f"❌ Failed to save session: {e}")
 
 # Convert session data to DataFrame
 records = list(session_data.values()) if session_data else []
