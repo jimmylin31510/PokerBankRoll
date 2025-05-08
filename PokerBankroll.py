@@ -2,15 +2,59 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
-import io
+import pyrebase
 
+# Firebase Configuration
+firebase_config = {
+    "apiKey": "AIzaSyBFOO1L0pZkmI973GA4z6CIw2Bv3nnJ8sc",
+    "authDomain": "pokerbankroll-cba0e.firebaseapp.com",
+    "projectId": "pokerbankroll-cba0e",
+    "storageBucket": "pokerbankroll-cba0e.firebasestorage.app",
+    "messagingSenderId": "774301975832",
+    "appId": "1:774301975832:web:c0205662c4b2bb076e0a6d",
+    "databaseURL": ""
+}
+
+firebase = pyrebase.initialize_app(firebase_config)
+auth = firebase.auth()
+db = firebase.database()
+
+# App title
 st.set_page_config(page_title="Poker Bankroll Tracker", page_icon="🃏")
 st.title("🎲 Poker Bankroll Tracker")
-st.markdown("Track your poker sessions, view your bankroll growth, and gain insights from your play.")
 
-# Session storage (for MVP)
-if "session_data" not in st.session_state:
-    st.session_state.session_data = []
+# Session state for login
+if "user" not in st.session_state:
+    st.session_state.user = None
+
+# Authentication UI
+def login():
+    st.subheader("🔐 Login or Sign Up")
+    choice = st.radio("Login or Sign Up", ["Login", "Sign Up"])
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+    if st.button("Submit"):
+        try:
+            if choice == "Login":
+                user = auth.sign_in_with_email_and_password(email, password)
+            else:
+                user = auth.create_user_with_email_and_password(email, password)
+            st.session_state.user = user
+            st.success("Successfully logged in!")
+        except Exception as e:
+            st.error(f"Authentication failed: {e}")
+
+if not st.session_state.user:
+    login()
+    st.stop()
+
+user_id = st.session_state.user["localId"]
+session_ref = f"users/{user_id}/sessions"
+
+# Load user's session data from Firebase
+session_data = db.child(session_ref).get().val()
+if not session_data:
+    session_data = {}
 
 # --- Input Form ---
 st.header("Add New Session")
@@ -30,8 +74,8 @@ with st.form("session_form"):
     if submitted:
         profit = cash_out - buy_in
         hourly_rate = profit / hours if hours > 0 else 0
-        st.session_state.session_data.append({
-            "Date": date,
+        entry = {
+            "Date": str(date),
             "Game Type": game_type,
             "Location": location,
             "Buy-In": buy_in,
@@ -40,14 +84,17 @@ with st.form("session_form"):
             "Hours": hours,
             "Hourly Rate": hourly_rate,
             "Notes": notes
-        })
-        st.success("Session added successfully!")
+        }
+        db.child(session_ref).push(entry)
+        st.success("Session added successfully! Please refresh to see updated data.")
 
-# --- Data Display ---
-st.header("📋 Session History")
-df = pd.DataFrame(st.session_state.session_data)
+# Convert session data to DataFrame
+records = list(session_data.values()) if session_data else []
+df = pd.DataFrame(records)
 if not df.empty:
+    df["Date"] = pd.to_datetime(df["Date"])
     df_sorted = df.sort_values("Date")
+    st.header("📋 Session History")
     st.dataframe(df_sorted, use_container_width=True)
 
     # --- Stats ---
@@ -73,13 +120,7 @@ if not df.empty:
 
     # --- Export CSV ---
     st.subheader("⬇️ Export Data")
-    buffer = io.StringIO()
-    df.to_csv(buffer, index=False)
-    st.download_button("Download CSV", data=buffer.getvalue(), file_name="poker_sessions.csv", mime="text/csv")
-
+    csv = df.to_csv(index=False)
+    st.download_button("Download CSV", data=csv, file_name="poker_sessions.csv", mime="text/csv")
 else:
     st.info("No session data yet. Add a session to get started!")
-
-
-
-
