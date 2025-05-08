@@ -76,6 +76,7 @@ with st.form("session_form"):
             "Hourly Rate": hourly_rate,
             "Notes": notes
         }
+        token = st.session_state.user['idToken']
         db.child(session_ref).push(entry)
         st.success("Session added successfully!")
 
