@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
 import pyrebase  # 使用 pyrebase，模組名稱不變
+import time
 
 # Firebase Configuration
 firebase_config = {
@@ -28,6 +29,8 @@ if "user" not in st.session_state:
     st.session_state.user = None
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+if "login_success" not in st.session_state:
+    st.session_state.login_success = False
 
 # Authentication UI
 def login():
@@ -43,7 +46,10 @@ def login():
                 user = auth.create_user_with_email_and_password(email, password)
             st.session_state.user = user
             st.session_state.logged_in = True
-            st.experimental_rerun()
+            st.session_state.login_success = True
+            st.success("Successfully logged in! Redirecting...")
+            time.sleep(1)
+            st.rerun()
         except Exception as e:
             st.error(f"Authentication failed: {e}")
 
@@ -57,7 +63,10 @@ if st.session_state.logged_in:
     if st.sidebar.button("🚪 Log out"):
         st.session_state.user = None
         st.session_state.logged_in = False
-        st.experimental_rerun()
+        st.session_state.login_success = False
+        st.success("You have been logged out.")
+        time.sleep(1)
+        st.rerun()
 
 user_id = st.session_state.user["localId"]
 session_ref = f"users/{user_id}/sessions"
