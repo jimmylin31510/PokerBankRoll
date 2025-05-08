@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import datetime
 import pyrebase  # 使用 pyrebase，模組名稱不變
 import time
-import os
 
 # Firebase Configuration
 firebase_config = {
@@ -48,9 +47,7 @@ def login():
             st.session_state.user = user
             st.session_state.logged_in = True
             st.session_state.login_success = True
-            st.success("Successfully logged in! You may need to manually refresh if not redirected.")
-            time.sleep(1)
-            os._exit(0)  # force rerun workaround for Streamlit Cloud
+            st.success("Successfully logged in! Please click the refresh button or navigate to another page.")
         except Exception as e:
             st.error(f"Authentication failed: {e}")
 
@@ -65,9 +62,8 @@ if st.session_state.logged_in:
         st.session_state.user = None
         st.session_state.logged_in = False
         st.session_state.login_success = False
-        st.success("You have been logged out.")
-        time.sleep(1)
-        os._exit(0)
+        st.success("You have been logged out. Please refresh the page.")
+        st.stop()
 
 user_id = st.session_state.user["localId"]
 session_ref = f"users/{user_id}/sessions"
