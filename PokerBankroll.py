@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
-import pyrebase4 as pyrebase  # ✅ 使用 pyrebase4，避免舊版錯誤
+import pyrebase  # ✅ 使用 pyrebase4，避免舊版錯誤
 
 # Firebase Configuration
 firebase_config = {
