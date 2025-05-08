@@ -1,9 +1,9 @@
+# pages/2_Main.py
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
-import pyrebase  # 使用 pyrebase，模組名稱不變
-import time
+import pyrebase
 
 # Firebase Configuration
 firebase_config = {
@@ -24,46 +24,17 @@ db = firebase.database()
 st.set_page_config(page_title="Poker Bankroll Tracker", page_icon="🃏")
 st.title("🎲 Poker Bankroll Tracker")
 
-# Session state for login
-if "user" not in st.session_state:
-    st.session_state.user = None
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "login_success" not in st.session_state:
-    st.session_state.login_success = False
-
-# Authentication UI
-def login():
-    st.subheader("🔐 Login or Sign Up")
-    choice = st.radio("Login or Sign Up", ["Login", "Sign Up"])
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-    if st.button("Submit"):
-        try:
-            if choice == "Login":
-                user = auth.sign_in_with_email_and_password(email, password)
-            else:
-                user = auth.create_user_with_email_and_password(email, password)
-            st.session_state.user = user
-            st.session_state.logged_in = True
-            st.session_state.login_success = True
-            st.success("Successfully logged in! Please click the refresh button or navigate to another page.")
-        except Exception as e:
-            st.error(f"Authentication failed: {e}")
-
-if not st.session_state.user:
-    login()
+# Check for login
+if "user" not in st.session_state or not st.session_state.user:
+    st.warning("Please login first from the Login page.")
     st.stop()
 
 # Optional: Logout Button
-if st.session_state.logged_in:
-    st.sidebar.markdown(f"👤 Logged in as: {st.session_state.user['email']}")
-    if st.sidebar.button("🚪 Log out"):
-        st.session_state.user = None
-        st.session_state.logged_in = False
-        st.session_state.login_success = False
-        st.success("You have been logged out. Please refresh the page.")
-        st.stop()
+st.sidebar.markdown(f"👤 Logged in as: {st.session_state.user['email']}")
+if st.sidebar.button("🚪 Log out"):
+    st.session_state.user = None
+    st.success("You have been logged out.")
+    st.stop()
 
 user_id = st.session_state.user["localId"]
 session_ref = f"users/{user_id}/sessions"
@@ -106,7 +77,7 @@ with st.form("session_form"):
             "Notes": notes
         }
         db.child(session_ref).push(entry)
-        st.success("Session added successfully! Please refresh to see updated data.")
+        st.success("Session added successfully!")
 
 # Convert session data to DataFrame
 records = list(session_data.values()) if session_data else []
